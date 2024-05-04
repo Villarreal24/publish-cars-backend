@@ -5,7 +5,6 @@ import cors from "cors";
 
 import * as middlewares from "./middlewares";
 import api from "./api";
-import MessageResponse from "./interfaces/MessageResponse";
 
 require("dotenv").config();
 const bodyParser = require("body-parser");
@@ -18,12 +17,6 @@ app.use(cors());
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
-app.get<{}, MessageResponse>("/", (req, res) => {
-  res.json({
-    message: "🦄🌈✨👋🌎🌍🌏✨🌈🦄",
-  });
-});
 
 app.use("/api", api);
 

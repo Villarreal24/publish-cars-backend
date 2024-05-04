@@ -1,11 +1,12 @@
 export async function login(
-  user: string,
-  password: string,
-  loginUrl: string,
-  page: any
+  user?: string,
+  password?: string,
+  loginUrl?: string,
+  page?: any
 ) {
   await page.goto(loginUrl);
-
+  console.log(user);
+  console.log(password);
   console.log("Start login");
   await page.type("input[id=email]", user);
   await page.type("input[id=password]", password);
@@ -26,14 +27,12 @@ export async function fillForm(
 ) {
   console.log("Start fill form");
 
+  await page.waitForSelector(".latam-dropdown-content#dropdown_brands");
+  // ==== TIMEOUT TO BE SURE THAT THE FORM IS LOADED ====
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   // ========= BRAND SELECTION ==========
-  const selectBrand = await page.waitForSelector("#dropdown_brands");
-  if (selectBrand) {
-    await page.click(
-      '.latam-dropdown-button[data-activates="dropdown_brands"]'
-    );
-    await page.click('#dropdown_brands li[data-content="acura"] a');
-  } else console.log("Fallo el BRAND selection");
+  await page.click('.latam-dropdown-button[data-activates="dropdown_brands"]');
+  await page.click('#dropdown_brands li[data-content="acura"] a');
   console.log("Finish BRAND selection");
 
   // ========= MODEL SELECTION ==========
@@ -44,15 +43,11 @@ export async function fillForm(
     return modelDropdown && modelDropdown.querySelectorAll("li").length > 1;
   });
 
-  const selectModel = await page.waitForSelector("#dropdown_models");
-  if (selectModel) {
-    await page.click(
-      '.latam-dropdown-button[data-activates="dropdown_models"]'
-    );
+  await page.waitForSelector("#dropdown_models");
+  await page.click('.latam-dropdown-button[data-activates="dropdown_models"]');
 
-    // Esperar a que el menú desplegable esté presente en la página
-    await page.click('#dropdown_models li[data-content="ilx"] a');
-  } else console.log("Fallo el MODEL selection");
+  // Esperar a que el menú desplegable esté presente en la página
+  await page.click('#dropdown_models li[data-content="ilx"] a');
   console.log("Finish MODEL selection");
 
   // ========= SUBTYPE SELECTION ==========
@@ -186,7 +181,7 @@ export async function fillForm(
   });
 
   // Esperar un breve momento para que se complete el desplazamiento
-  await new Promise((resolve) => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 1000));
 
   // ==== UPLOAD FILE IMAGE TO INPUT TYPE IMAGE =====
   const fileInput = await page.$("input[type=file]");

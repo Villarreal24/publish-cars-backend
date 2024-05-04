@@ -1,38 +1,29 @@
 import express from "express";
 import puppeteer from "puppeteer";
 import MessageResponse from "../interfaces/MessageResponse";
-import emojis from "./emojis";
 import { login, fillForm } from "../puppeteer/puppeteerUtils";
 
 const router = express.Router();
 
-const baseUrl = "https://www.seminuevos.com/";
-const loginUrl = "https://admin.seminuevos.com/login";
-
-const user = "luis.villarreal.lavr@gmail.com";
-const password = "*Seminuevos200@";
-
-router.get<{}, MessageResponse>("/", (req, res) => {
-  res.json({
-    message: "API - 👋🌎🌍🌏",
-  });
-});
-
 router.post<{}, MessageResponse>("/publish", async (req, res) => {
-  const { price, description, images } = req.body;
-  console.log("BODY: ", req.body);
-  console.log("IMAGES: ", images);
+  const { price, description } = req.body;
   let browser = await puppeteer.launch({ headless: true });
+
+  const baseUrl = process.env.BASE_URL;
+  const loginUrl = process.env.LOGIN_URL;
+  const user = process.env.USER_EMAIL;
+  const password = process.env.PASSWORD;
 
   try {
     let page = await browser.newPage();
     ({ page } = await login(user, password, loginUrl, page));
 
     // ======= REDIRECT TO FORM TO PUBLISH =======
-    await page.goto("https://www.seminuevos.com/wizard?f_dealer_id=-1", {
+    await page.goto(`${baseUrl}wizard?f_dealer_id=-1`, {
       waitUntil: "networkidle0",
     });
 
+    // ==== CALL FUNCTION TO FILL FORM ====
     ({ browser, page } = await fillForm(price, description, page, browser));
 
     await page.waitForSelector("button.next-button:not(.back)");
@@ -68,7 +59,5 @@ router.post<{}, MessageResponse>("/publish", async (req, res) => {
     await browser.close();
   }
 });
-
-router.use("/emojis", emojis);
 
 export default router;
