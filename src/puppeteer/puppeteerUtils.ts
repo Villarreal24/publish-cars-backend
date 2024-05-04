@@ -5,8 +5,6 @@ export async function login(
   page?: any
 ) {
   await page.goto(loginUrl);
-  console.log(user);
-  console.log(password);
   console.log("Start login");
   await page.type("input[id=email]", user);
   await page.type("input[id=password]", password);
@@ -29,7 +27,7 @@ export async function fillForm(
 
   await page.waitForSelector(".latam-dropdown-content#dropdown_brands");
   // ==== TIMEOUT TO BE SURE THAT THE FORM IS LOADED ====
-  await new Promise((resolve) => setTimeout(resolve, 1000));
+  await new Promise((resolve) => setTimeout(resolve, 2000));
   // ========= BRAND SELECTION ==========
   await page.click('.latam-dropdown-button[data-activates="dropdown_brands"]');
   await page.click('#dropdown_brands li[data-content="acura"] a');
